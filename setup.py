@@ -7,15 +7,15 @@ setup(
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
-    install_requires=["docutils>=0.3"],
+    install_requires=["docutils>=0.3", "requests"],
 
     # metadata to display on PyPI
     author="Sarthak Khattar",
     author_email="sarthakoct@gmail.com",
     description="Package to interact with MyAnimeList using the Official API",
-    keywords="hello world example examples",
+    keywords="MAL API Script",
     url="https://github.com/m0mosenpai/malupdate",   # project home page, if any
-
+    download_url="https://github.com/m0mosenpai/malupdate/archive/v_01.tar.gz",
     classifiers=[
         'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
         'Intended Audience :: Developers',      # Define that your audience are developers

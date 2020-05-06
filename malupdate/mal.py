@@ -85,9 +85,10 @@ class Anime:
 			for field in fields:
 				query += (field + ",")
 			URL = "https://api.myanimelist.net/v2/anime?q={}".format(aname) + query[:-1]
+			URL += query
 	
 		headers = REQUEST_HEADERS
 		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
 
-		searchResults = requests.get(URL + query, headers = headers).json()
+		searchResults = requests.get(URL, headers = headers).json()
 		return searchResults

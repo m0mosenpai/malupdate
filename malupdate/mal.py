@@ -21,9 +21,9 @@ class User:
 		    "Content-Length": "112",
 		}
 		data = "grant_type=password&client_id=6114d00ca681b7701d1e15fe11a4987e&password={}&username={}".format(passwd, user)
-		
+
 		loginData = requests.post(URL, data = data, headers= headers).json()
-		return loginData	
+		return loginData
 
 	#Re-authenticate session if Access Token expires (30 Days)
 	#Probably won't need this in most use cases
@@ -38,12 +38,12 @@ class User:
 		    "Content-Length": "88",
 		}
 		data = "client_id=6114d00ca681b7701d1e15fe11a4987e&grant_type=refresh_token&refresh_token={}".format(refreshToken)
-		
+
 		loginData = requests.post(URL, data = data, headers = headers).json()
 		return loginData
 
 	#Gets user's watchlist - status can be watching, completed, on_hold, dropped, plan_to_watch
-	#Fields can have multiple options.	
+	#Fields can have multiple options.
 	def getAnimeList(ACCESS_TOKEN, status, fields=[]):
 		if not fields:
 			URL = "https://api.myanimelist.net/v2/users/@me/animelist?status={}".format(status)
@@ -55,8 +55,19 @@ class User:
 
 		headers = REQUEST_HEADERS
 		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+		response = requests.get(URL, headers = headers).json()
+		nextPage = response['paging']
 
-		animeList = requests.get(URL, headers = headers).json()
+		# If response doesn't have a next field, simply return it
+		if not nextPage:
+			return response
+		# While the next field in response is not empty, keep sending request for next page
+		animeList = [response]
+		while 'next' in nextPage:
+			nextURL = nextPage['next']
+			nextResponse = requests.get(nextURL, headers = headers).json()
+			animeList.append(nextResponse)
+			nextPage = nextResponse['paging']
 		return animeList
 
 	#Changes values of fields as per arguments
@@ -75,7 +86,7 @@ class User:
 
 #Class to update watchlist on MAL
 class Anime:
-	#Search anime in search field of MAL	
+	#Search anime in search field of MAL
 	def search(ACCESS_TOKEN, aname, fields=[]):
 		aname = aname.replace(' ', '+')
 		if not fields:
@@ -86,7 +97,7 @@ class Anime:
 				query += (field + ",")
 			URL = "https://api.myanimelist.net/v2/anime?q={}".format(aname) + query[:-1]
 			URL += query
-	
+
 		headers = REQUEST_HEADERS
 		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
 

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="malupdate",
-    version="0.2",
+    version="0.3",
     packages=find_packages(),
 
     # Project uses reStructuredText, so ensure that the docutils get
@@ -15,7 +15,7 @@ setup(
     description="Package to interact with MyAnimeList using the Official API",
     keywords="MAL API Script",
     url="https://github.com/m0mosenpai/malupdate",   # project home page, if any
-    download_url="https://github.com/m0mosenpai/malupdate/archive/v_02.tar.gz",
+    download_url="https://github.com/m0mosenpai/malupdate/archive/v0.3.tar.gz",
     classifiers=[
         'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
         'Intended Audience :: Developers',      # Define that your audience are developers

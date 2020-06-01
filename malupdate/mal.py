@@ -58,9 +58,6 @@ class User:
 		response = requests.get(URL, headers = headers).json()
 		nextPage = response['paging']
 
-		# If response doesn't have a next field, simply return it
-		if not nextPage:
-			return response
 		# While the next field in response is not empty, keep sending request for next page
 		animeList = [response]
 		while 'next' in nextPage:

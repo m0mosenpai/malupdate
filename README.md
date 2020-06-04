@@ -12,7 +12,7 @@ PyPi: https://pypi.org/project/malupdate/ <br>
 
 * **`User.getAnimeList(Access_Token, type_of_list, [field_1, field_2, ....]):`** Takes the `access_token` from the loginObject, the type of list (`watching`/ `plan_to_watch`/ `completed`/ `on_hold`/ `dropped`) and one or more [fields](https://github.com/SuperMarcus/myanimelist-api-specification#response-objects) as a list. Returns a JSON object (dictionary) of shows in the list.
 
-* **`User.updateList(Access_Token, show_id, [field_1, field_2, ...], [field_val_1, field_val_2, ...]):`** Takes the `access_token` from the loginObject, `id` of the show to be updated, a list of [fields](https://github.com/SuperMarcus/myanimelist-api-specification#response-objects) which are to be updates and their corresponding new values in list form. <br>
+* **`User.updateList(Access_Token, show_id, {field_1: val_1, field_2: val_2 ...}):`** Takes the `access_token` from the loginObject, `id` of the show to be updated, a list of [fields](https://github.com/SuperMarcus/myanimelist-api-specification#response-objects) which are to be updated and their corresponding new values in dictionary form. <br>
 Returns a JSON object (dictionary) of user's list with updated values.
 
 ### `Class Anime`:

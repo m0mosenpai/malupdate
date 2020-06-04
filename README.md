@@ -19,5 +19,8 @@ Returns a JSON object (dictionary) of user's list with updated values.
 * **`Anime.search(Access_Token, anime_name, [field_1, field_2, ...]):`** Takes the `access_token`, name of the anime and the [fields](https://github.com/SuperMarcus/myanimelist-api-specification#response-objects) to be displayed as arguments. Returns a JSON object (dictionary) of search results. <br>
 NSFW Results are filtered out by default (Don't know of any way around this as of now). However, if the NSFW Title is already in your anime list, it is shown by `User.getAnimeList()`.
 
+## Projects that use malupdate
+* [Umaru-chan](https://github.com/m0mosenpai/Umaru-chan)
+
 ## License
 MIT

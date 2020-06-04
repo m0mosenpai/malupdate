@@ -68,15 +68,18 @@ class User:
 		return animeList
 
 	#Changes values of fields as per arguments
-	def updateList(ACCESS_TOKEN, id, myListFields, values):
+	def updateList(ACCESS_TOKEN, id, fields):
+		# making fields a dictionary is better for the developer instead of making two lists, example: {"num_watched_episodes":1, "status":"watching"}
+		
 		URL = "https://api.myanimelist.net/v2/anime/{}/my_list_status".format(id)
 
 		headers = REQUEST_HEADERS
 		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
 
 		data = ""
-		for i,field in enumerate(myListFields):
-			data += "{}={}&".format(field, values[i])
+		for key in fields.keys():
+			data += "{}={}&".format(key, fields[key])
+			
 		updatedList = requests.put(URL, data = data[:-1], headers = headers).json()
 
 		return updatedList

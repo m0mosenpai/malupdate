@@ -1,6 +1,6 @@
 import requests
 
-#Constan request headers
+# Constant request headers
 REQUEST_HEADERS = {
 	"Host": "api.myanimelist.net",
 	"Accept": "application/json",
@@ -25,8 +25,8 @@ class User:
 		loginData = requests.post(URL, data = data, headers= headers).json()
 		return loginData
 
-	#Re-authenticate session if Access Token expires (30 Days)
-	#Probably won't need this in most use cases
+	# Re-authenticate session if Access Token expires (30 Days)
+	# Probably won't need this in most use cases
 	def reAuthenticate(refreshToken):
 		URL = "https://myanimelist.net/v1/oauth2/token"
 		headers= {
@@ -42,16 +42,36 @@ class User:
 		loginData = requests.post(URL, data = data, headers = headers).json()
 		return loginData
 
-	#Gets user's watchlist - status can be watching, completed, on_hold, dropped, plan_to_watch
-	#Fields can have multiple options.
-	def getAnimeList(ACCESS_TOKEN, status, fields=[]):
+	# Endpoint: /users/@me
+	# Get User's personal statistics
+	# fields can be: [anime_statistics] (only known field as of this version)
+	def myInfo(ACCESS_TOKEN, fields=[]):
 		if not fields:
-			URL = "https://api.myanimelist.net/v2/users/@me/animelist?status={}".format(status)
+			URL = "https://api.myanimelist.net/v2/users/@me"
+		else:
+			query = "?fields="
+			for field in fields:
+				query += (field + ",")
+			URL = "https://api.myanimelist.net/v2/users/@me" + query[:-1]
+
+		headers = REQUEST_HEADERS
+		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+
+		stats = requests.get(URL, headers = headers).json()
+		return stats
+
+	# Endpoint: /users/{user_name}/animelist
+	# where {user_name} can be @me for user's own list
+	# Gets user's watchlist - status can be [watching, completed, on_hold, dropped, plan_to_watch]
+	# sort can have [list_score, list_updated_at, anime_title, anime_start_date]
+	def getAnimeList(ACCESS_TOKEN, status, fields=[], sort="", limit=100, offset=0):
+		if not fields:
+			URL = "https://api.myanimelist.net/v2/users/@me/animelist?status={}&limit={}&offset={}&sort={}".format(status, limit, offset, sort)
 		else:
 			query = "&fields="
 			for field in fields:
 				query += (field + ",")
-			URL = "https://api.myanimelist.net/v2/users/@me/animelist?status={}".format(status) + query[:-1]
+			URL = "https://api.myanimelist.net/v2/users/@me/animelist?status={}&limit={}&offset={}&sort={}".format(status, limit, offset, sort) + query[:-1]
 
 		headers = REQUEST_HEADERS
 		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
@@ -67,10 +87,9 @@ class User:
 			nextPage = nextResponse['paging']
 		return animeList
 
-	#Changes values of fields as per arguments
-	def updateList(ACCESS_TOKEN, id, fields):
-		# making fields a dictionary is better for the developer instead of making two lists, example: {"num_watched_episodes":1, "status":"watching"}
-		
+	# Endpoint: /anime/{anime_id}/my_list_status
+	# Changes values of fields as per arguments
+	def updateList(ACCESS_TOKEN, id, fields):		
 		URL = "https://api.myanimelist.net/v2/anime/{}/my_list_status".format(id)
 
 		headers = REQUEST_HEADERS
@@ -84,18 +103,29 @@ class User:
 
 		return updatedList
 
-#Class to update watchlist on MAL
+	# Endpoint: /anime/{anime_id}/my_list_status
+	# Removes an item from the User's list
+	def deleteItem(ACCESS_TOKEN, id):
+		URL = "https://api.myanimelist.net/v2/anime/{}/my_list_status".format(id)
+
+		headers = REQUEST_HEADERS
+		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+
+		requests.delete(URL, headers = headers).json()
+
+# General Anime class to search and find anime
 class Anime:
-	#Search anime in search field of MAL
-	def search(ACCESS_TOKEN, aname, fields=[]):
+	# Endpoint: /anime
+	# Search anime in search field of MAL
+	def search(ACCESS_TOKEN, aname, fields=[], nsfw=False):
 		aname = aname.replace(' ', '+')
 		if not fields:
-			URL = "https://api.myanimelist.net/v2/anime?q={}".format(aname)
+			URL = "https://api.myanimelist.net/v2/anime?q={}&nsfw={}".format(aname, nsfw)
 		else:
 			query = "&fields="
 			for field in fields:
 				query += (field + ",")
-			URL = "https://api.myanimelist.net/v2/anime?q={}".format(aname) + query[:-1]
+			URL = "https://api.myanimelist.net/v2/anime?q={}&nsfw={}".format(aname, nsfw) + query[:-1]
 			URL += query
 
 		headers = REQUEST_HEADERS
@@ -103,3 +133,61 @@ class Anime:
 
 		searchResults = requests.get(URL, headers = headers).json()
 		return searchResults
+
+	# Endpoint: /anime/ranking
+	# Get anime rankings based on following ranking types:
+	# [all, airing, upcoming, tv, ova, movie, special, bypopularity, favorite]
+	def byRanking(ACCESS_TOKEN, ranking_type, fields=[], limit=100, offset=0, nsfw=False):
+		if not fields:
+			URL = "https://api.myanimelist.net/v2/anime/ranking?ranking_type={}&limit={}&offset={}&nsfw={}".format(ranking_type, limit, offset, nsfw)
+		else:
+			query = "&fields="
+			for field in fields:
+				query += (field + ",")
+			URL = "https://api.myanimelist.net/v2/anime/ranking?ranking_type={}&limit={}&offset={}&nsfw={}".format(ranking_type, limit, offset, nsfw) + query[:-1]
+			URL += query
+
+		headers = REQUEST_HEADERS
+		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+
+		rankings = requests.get(URL, headers = headers).json()
+		return rankings
+
+	# Endpoint: /anime/season/{year}/{season}
+	# Seasons can be: [winter, spring, summer, fall]
+	# Get seasonal anime and sort in descending based on:
+	# [anime_score, anime_num_list_users]
+	def bySeason(ACCESS_TOKEN, year, season, fields=[], sort="", limit=100, offset=0, nsfw=False):
+		if not fields:
+			URL = "https://api.myanimelist.net/v2/anime/season/{}/{}?sort={}&limit={}&offset={}&nsfw={}".format(year, season, sort, limit, offset, nsfw)
+		else:
+			query = "&fields="
+			for field in fields:
+				query += (field + ",")
+			URL = "https://api.myanimelist.net/v2/anime/season/{}/{}?sort={}&limit={}&offset={}&nsfw={}".format(year, season, sort, limit, offset, nsfw) + query[:-1]
+			URL += query
+
+		headers = REQUEST_HEADERS
+		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+
+		seasonal = requests.get(URL, headers = headers).json()
+		return seasonal
+
+	# Endpoint: /anime/suggestions
+	# Get suggested anime based on my list
+	# (Empty list is returned for new user)
+	def suggested(ACCESS_TOKEN, fields=[], limit=100, offset=0, nsfw=False):
+		if not fields:
+			URL = "https://api.myanimelist.net/v2/anime/suggestions?limit={}&offset={}&nsfw={}".format(limit, offset, nsfw)
+		else:
+			query = "&fields="
+			for field in fields:
+				query += (field + ",")
+			URL = "https://api.myanimelist.net/v2/anime/suggestions?limit={}&offset={}".format(limit, offset, nsfw) + query[:-1]
+			URL += query
+
+		headers = REQUEST_HEADERS
+		headers["Authorization"] = "Bearer {}".format(ACCESS_TOKEN)
+
+		suggested = requests.get(URL, headers = headers).json()
+		return suggested

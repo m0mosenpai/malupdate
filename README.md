@@ -1,7 +1,8 @@
 # malupdate
 Unofficial Python client wrapper for v2 MyAnimeList API using the Unoffical Specification of the Official API by <br>
 https://github.com/SuperMarcus/myanimelist-api-specification <br>
-This is most likely temporary till the time I can get beta access to MAL's API or they release it to the public.
+~~This is most likely temporary till the time I can get beta access to MAL's API or they release it to the public.~~ <br>
+As of July 2020, MAL has made their API public and any changes and updates done to this project will be in reference to the official documentation of the API.
 
 ## Installation
 PyPi: https://pypi.org/project/malupdate/ <br>
